@@ -22,7 +22,7 @@ public class Login extends JFrame {
 
         setTitle("Login - Urna Eletrônica");
         setSize(400, 300);
-        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);  // Impede o fechamento padrão
         setLocationRelativeTo(null);
         setResizable(false);
 
@@ -94,33 +94,43 @@ public class Login extends JFrame {
                 char[] senha = txtSenha.getPassword();
 
                 if (fazerLogin(matricula, senha)) {
-                    
-                    new TelaAdm().setVisible(true);
-                    dispose();
+                    if (matricula.equals(adminMatricula)) {
+                        new TelaAdm().setVisible(true);  
+                    } else {
+                        JOptionPane.showMessageDialog(null, "Bem-vindo(a), " + matricula + "!");
+                    }
+                    dispose();  
                 } else {
                     JOptionPane.showMessageDialog(null, "Matrícula ou senha inválidos.");
+                }
+            }
+        });
+
+        addWindowListener(new WindowAdapter() {
+            @Override
+            public void windowClosing(WindowEvent e) {
+                int resposta = JOptionPane.showConfirmDialog(
+                        null, 
+                        "Você tem certeza que deseja sair?", 
+                        "Confirmar", 
+                        JOptionPane.YES_NO_OPTION);
+                if (resposta == JOptionPane.YES_OPTION) {
+                    System.exit(0); // Fecha a aplicação
                 }
             }
         });
     }
 
     private boolean fazerLogin(String matricula, char[] senha) {
-        if (matriculasUsadas.contains(matricula)) {
-            JOptionPane.showMessageDialog(null, "Matrícula já utilizada.");
-            return false;
-        }
-
-        if (!matricula.equals(adminMatricula)) {
-            matriculasUsadas.add(matricula);
-            return true;
+        if (!matriculasUsadas.contains(matricula)) {
+            matriculasUsadas.add(matricula);  
         }
 
         if (matricula.equals(adminMatricula) && new String(senha).equals(adminSenha)) {
-            matriculasUsadas.add(matricula);
-            return true;
+            return true;  
         }
 
-        return false;
+        return matriculasUsadas.contains(matricula);  
     }
 
     public static void main(String[] args) {
